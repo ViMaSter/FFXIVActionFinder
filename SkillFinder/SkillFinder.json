@@ -1,10 +1,10 @@
 {
   "Author": "ViMaSter",
   "Name": "Skill Finder",
-  "Punchline": "Shows gil spread across regions, data centers, characters and retainers.",
-  "Description": "Shows gil spread across regions, data centers, characters and retainers.",
+  "Punchline": "Highlight actions inside bars, when hovered over in the action list.",
+  "Description": "Highlight actions inside bars, when hovered over in the action list.",
   "ApplicableVersion": "any",
   "Tags": [
-    "gil"
+    "actions"
   ]
 }
