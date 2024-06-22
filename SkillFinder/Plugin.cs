@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using SkillFinder.Windows;
-using Dalamud.Game;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using SkillFinder.Extensions;
+using SkillFinder.Windows;
 
 namespace SkillFinder;
 
@@ -17,10 +17,7 @@ namespace SkillFinder;
 // ReSharper disable once UnusedType.Global - Dalamud plugin entry point
 public sealed class Plugin : IDalamudPlugin
 {
-    private const string CommandName = "/gil";
-
     private DalamudPluginInterface PluginInterface { get; init; }
-    private ICommandManager CommandManager { get; init; }
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("SkillFinder");
@@ -28,26 +25,26 @@ public sealed class Plugin : IDalamudPlugin
     
     private readonly CancellationTokenSource tokenSource = new();
 
-    enum CrossBars
+    private readonly List<Tuple<int, int>> lastHoveredKeyboardActions = [];
+    private readonly List<Tuple<AddonActionCrossExtensions.CrossBars, int>> lastHoveredActionsCross = [];
+    private bool showHighlight;
+
+    private readonly Dictionary<string, AddonActionCrossExtensions.CrossBars> mappings = new()
     {
-        Main,
-        DoubleL,
-        DoubleR
-    }
+        {"_ActionCross", AddonActionCrossExtensions.CrossBars.Cross},
+        {"_ActionDoubleCrossL", AddonActionCrossExtensions.CrossBars.DoubleCrossL},
+        {"_ActionDoubleCrossR", AddonActionCrossExtensions.CrossBars.DoubleCrossR}
+    };
     
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-        [RequiredVersion("1.0")] ICommandManager commandManager,
         [RequiredVersion("1.0")] IPluginLog pluginLog,
-        [RequiredVersion("1.0")] IFramework framework,
         [RequiredVersion("1.0")] IClientState clientState,
         [RequiredVersion("1.0")] IAddonLifecycle addonLifecycle,
-        [RequiredVersion("1.0")] ISigScanner sigScanner,
         [RequiredVersion("1.0")] IGameGui gameGUI
             )
     {
         PluginInterface = pluginInterface;
-        CommandManager = commandManager;
         PluginLog = pluginLog;
         ClientState = clientState;
 
@@ -62,238 +59,65 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenMainUi += () => MainWindow.Toggle();
         PluginInterface.UiBuilder.OpenConfigUi += () => {};
-
-        var lastHoveredActions = new List<Tuple<int, int>>();
-        var lastHoveredActionsCross = new List<Tuple<CrossBars, int>>();
-        var showHighlight = false;
         
-        addonLifecycle.RegisterListener(AddonEvent.PreSetup, "ActionMenu", (type, args) =>
+        addonLifecycle.RegisterListener(AddonEvent.PreSetup, "ActionMenu", (_, _) =>
         {
             showHighlight = true;
         });
-        addonLifecycle.RegisterListener(AddonEvent.PreFinalize, "ActionMenu", (type, args) =>
+        addonLifecycle.RegisterListener(AddonEvent.PreFinalize, "ActionMenu", (_, _) =>
         {
             showHighlight = false;
             
-            foreach (var (lastHoveredActionColumn, lastHoveredActionRow) in lastHoveredActions)
-            {
-                var indexString = lastHoveredActionRow == 0 ? "" : lastHoveredActionRow.ToString("D2");
-                var actionbarPointer = gameGUI.GetAddonByName($"_ActionBar{indexString}");
-                unsafe
-                {
-                    var actionBar = (AddonActionBarBase*) actionbarPointer;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                }
-            }
-            foreach (var (lastHoveredActionCrossBar, lastHoveredActionColumn) in lastHoveredActionsCross)
-            {
-                var actioncrossPointer = gameGUI.GetAddonByName($"_ActionCross");
-                var actiondoublecrosslPointer = gameGUI.GetAddonByName($"_ActionDoubleCrossL");
-                var actiondoublecrossrPointer = gameGUI.GetAddonByName($"_ActionDoubleCrossR");
-                unsafe
-                {
-                    if (lastHoveredActionCrossBar == CrossBars.Main)
-                    {
-                        var actionBar = (AddonActionCross*) actioncrossPointer;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                    }
-                    else if (lastHoveredActionCrossBar == CrossBars.DoubleL)
-                    {
-                        var actionBar = (AddonActionCross*) actiondoublecrosslPointer;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                    }
-                    else if (lastHoveredActionCrossBar == CrossBars.DoubleR)
-                    {
-                        var actionBar = (AddonActionCross*) actiondoublecrossrPointer;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                    }
-                }
-            }
-            lastHoveredActions.Clear();             
-            lastHoveredActionsCross.Clear();
+            AddonActionCrossExtensions.CleanupHighlights(gameGUI, lastHoveredKeyboardActions, lastHoveredActionsCross);
         });
         
-        gameGUI.HoveredActionChanged += (sender, action) =>
+        gameGUI.HoveredActionChanged += (_, action) =>
         {
             if (!showHighlight)
             {
                 return;
             }
             
-            foreach (var (lastHoveredActionColumn, lastHoveredActionRow) in lastHoveredActions)
-            {
-                var indexString = lastHoveredActionRow == 0 ? "" : lastHoveredActionRow.ToString("D2");
-                var actionbarPointer = gameGUI.GetAddonByName($"_ActionBar{indexString}");
-                unsafe
-                {
-                    var actionBar = (AddonActionBarBase*) actionbarPointer;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                    actionBar->ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                }
-            }
-            foreach (var (lastHoveredActionCrossBar, lastHoveredActionColumn) in lastHoveredActionsCross)
-            {
-                var actioncrossPointer = gameGUI.GetAddonByName($"_ActionCross");
-                var actiondoublecrosslPointer = gameGUI.GetAddonByName($"_ActionDoubleCrossL");
-                var actiondoublecrossrPointer = gameGUI.GetAddonByName($"_ActionDoubleCrossR");
-                unsafe
-                {
-                    if (lastHoveredActionCrossBar == CrossBars.Main)
-                    {
-                        var actionBar = (AddonActionCross*) actioncrossPointer;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                    }
-                    else if (lastHoveredActionCrossBar == CrossBars.DoubleL)
-                    {
-                        var actionBar = (AddonActionCross*) actiondoublecrosslPointer;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                    }
-                    else if (lastHoveredActionCrossBar == CrossBars.DoubleR)
-                    {
-                        var actionBar = (AddonActionCross*) actiondoublecrossrPointer;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddRed_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddGreen_2 = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue = 0;
-                        actionBar->ActionBarBase.ActionBarSlotVector.Get((ulong) lastHoveredActionColumn).Icon->AtkResNode.AddBlue_2 = 0;
-                    }
-                }
-            }
-            lastHoveredActions.Clear();             
-            lastHoveredActionsCross.Clear();
+            AddonActionCrossExtensions.CleanupHighlights(gameGUI, lastHoveredKeyboardActions, lastHoveredActionsCross);
             
             // handle keyboard cross bar
             pluginLog.Warning(action.ActionID.ToString());
-            for (var i = 0; i < 10; i++)
+            unsafe
             {
-                var indexString = i == 0 ? "" : i.ToString("D2");
-                var actionbarPointer = gameGUI.GetAddonByName($"_ActionBar{indexString}");
-                unsafe
+                for (var i = 0; i < 10; i++)
                 {
-                    var actionBar = (AddonActionBarBase*) actionbarPointer;
-                    for (ulong j = 0; j < actionBar->ActionBarSlotVector.Size(); j++)
+                    var indexString = i == 0 ? "" : i.ToString("D2");
+                    var actionbarPointer = gameGUI.GetAddonByName($"_ActionBar{indexString}");
+                    var actionBar = (AddonActionBarBase*)actionbarPointer;
+                    var result = actionBar->HandleActionBar(i, action.ActionID);
+                    if (result == null)
                     {
-                        var actionId = actionBar->ActionBarSlotVector.Get(j).ActionId;
-                        if (actionId == action.ActionID)
-                        {
-                            lastHoveredActions.Add(new Tuple<int, int>((int) j, i));
-                            actionBar->ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed = 128;
-                            actionBar->ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed_2 = 128;
-                            actionBar->ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen = 128;
-                            actionBar->ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen_2 = 128;
-                            actionBar->ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue = 128;
-                            actionBar->ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue_2 = 128;
-                            pluginLog.Warning($"Found action {actionId} in actionbar {i}, slot {j}");
-                        }
+                        continue;
                     }
+                    foreach (var (row, column) in result)
+                    {
+                        pluginLog.Warning($"Found action in row {row} column {column}");
+                    }
+
+                    lastHoveredKeyboardActions.AddRange(result);
                 }
-            }
-            
-            // handle controller cross bar
-            {
-                // _ActionCross
-                // _ActionDoubleCrossL
-                // _ActionDoubleCrossR
-                
-                var actioncrossPointer = gameGUI.GetAddonByName($"_ActionCross");
-                unsafe
+
+                // handle action cross bars
+                foreach (var (addonName, location) in mappings)
                 {
-                    var actionBar = (AddonActionCross*) actioncrossPointer;
-                    
-                    for (ulong j = 0; j < actionBar->ActionBarBase.ActionBarSlotVector.Size(); j++)
+                    var actionCrossPointer = gameGUI.GetAddonByName(addonName);
+                    var actionBar = (AddonActionCross*)actionCrossPointer;
+                    var result = actionBar->ActionBarBase.HandleActionBar(location, action.ActionID);
+                    if (result == null)
                     {
-                        var actionId = actionBar->ActionBarBase.ActionBarSlotVector.Get(j).ActionId;
-                        if (actionId == action.ActionID)
-                        {
-                            lastHoveredActionsCross.Add(new Tuple<CrossBars, int>(CrossBars.Main, (int) j));
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed_2 = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen_2 = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue_2 = 128;
-                            pluginLog.Warning($"Found action {actionId} in actionbar 10, slot {j}");
-                        }
+                        continue;
                     }
-                }
-                
-                var actiondoublecrosslPointer = gameGUI.GetAddonByName($"_ActionDoubleCrossL");
-                unsafe
-                {
-                    var actionBar = (AddonActionCross*) actiondoublecrosslPointer;
-                    
-                    for (ulong j = 0; j < actionBar->ActionBarBase.ActionBarSlotVector.Size(); j++)
+                    foreach (var (row, column) in result)
                     {
-                        var actionId = actionBar->ActionBarBase.ActionBarSlotVector.Get(j).ActionId;
-                        if (actionId == action.ActionID)
-                        {
-                            lastHoveredActionsCross.Add(new Tuple<CrossBars, int>(CrossBars.DoubleL, (int) j));
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed_2 = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen_2 = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue_2 = 128;
-                            pluginLog.Warning($"Found action {actionId} in actionbar 11, slot {j}");
-                        }
+                        pluginLog.Warning($"Found action in row {row} column {column}");
                     }
-                }
-                
-                var actiondoublecrossrPointer = gameGUI.GetAddonByName($"_ActionDoubleCrossR");
-                unsafe
-                {
-                    var actionBar = (AddonActionCross*) actiondoublecrossrPointer;
-                    
-                    for (ulong j = 0; j < actionBar->ActionBarBase.ActionBarSlotVector.Size(); j++)
-                    {
-                        var actionId = actionBar->ActionBarBase.ActionBarSlotVector.Get(j).ActionId;
-                        if (actionId == action.ActionID)
-                        {
-                            lastHoveredActionsCross.Add(new Tuple<CrossBars, int>(CrossBars.DoubleR, (int) j));
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddRed_2 = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddGreen_2 = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue = 128;
-                            actionBar->ActionBarBase.ActionBarSlotVector.Get(j).Icon->AtkResNode.AddBlue_2 = 128;
-                            pluginLog.Warning($"Found action {actionId} in actionbar 12, slot {j}");
-                        }
-                    }
+
+                    lastHoveredActionsCross.AddRange(result);
                 }
             }
         };
