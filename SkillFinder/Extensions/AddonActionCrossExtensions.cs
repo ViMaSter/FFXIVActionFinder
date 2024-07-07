@@ -34,7 +34,7 @@ public static class AddonActionCrossExtensions
 
     private static unsafe void CleanupHighlights(AddonActionBarBase actionBar, int column)
     {
-        var icon = actionBar.ActionBarSlotVector.Get((ulong) column).Icon;
+        var icon = actionBar.ActionBarSlotVector[column].Icon;
         SetActionBarSlot(icon, State.None);
     }
     
@@ -57,7 +57,7 @@ public static class AddonActionCrossExtensions
             unsafe
             {
                 var actionBar = (AddonActionCross*) actionCrossPointer;
-                CleanupHighlights(actionBar->ActionBarBase, lastHoveredActionColumn);
+                CleanupHighlights(actionBar->AddonActionBarBase, lastHoveredActionColumn);
             }
         }
         lastHoveredKeyboardActions.Clear();             
@@ -67,12 +67,12 @@ public static class AddonActionCrossExtensions
     public static unsafe List<Tuple<CrossBars, int>> HandleActionBar(this AddonActionBarBase actionBar, CrossBars crossBars, uint actionID)
     {
         var result = new List<Tuple<CrossBars, int>>();
-        for (ulong j = 0; j < actionBar.ActionBarSlotVector.Size(); j++)
+        for (long j = 0; j < actionBar.ActionBarSlotVector.LongCount; j++)
         {
-            var actionId = actionBar.ActionBarSlotVector.Get(j).ActionId;
+            var actionId = actionBar.ActionBarSlotVector[j].ActionId;
             if (actionId == actionID)
             {
-                SetActionBarSlot(actionBar.ActionBarSlotVector.Get(j).Icon, State.Highlighted);
+                SetActionBarSlot(actionBar.ActionBarSlotVector[j].Icon, State.Highlighted);
                 result.Add(new Tuple<CrossBars, int>(crossBars, (int)j));
             }
         }
@@ -83,12 +83,12 @@ public static class AddonActionCrossExtensions
     public static unsafe List<Tuple<int, int>> HandleActionBar(this AddonActionBarBase actionBar, int row, uint actionID)
     {
         var result = new List<Tuple<int, int>>();
-        for (ulong j = 0; j < actionBar.ActionBarSlotVector.Size(); j++)
+        for (long j = 0; j < actionBar.ActionBarSlotVector.LongCount; j++)
         {
-            var actionId = actionBar.ActionBarSlotVector.Get(j).ActionId;
+            var actionId = actionBar.ActionBarSlotVector[j].ActionId;
             if (actionId == actionID)
             {
-                SetActionBarSlot(actionBar.ActionBarSlotVector.Get(j).Icon, State.Highlighted);
+                SetActionBarSlot(actionBar.ActionBarSlotVector[j].Icon, State.Highlighted);
                 result.Add(new Tuple<int, int>((int)j, row));
             }
         }

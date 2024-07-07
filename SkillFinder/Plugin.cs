@@ -17,7 +17,7 @@ namespace SkillFinder;
 // ReSharper disable once UnusedType.Global - Dalamud plugin entry point
 public sealed class Plugin : IDalamudPlugin
 {
-    private DalamudPluginInterface PluginInterface { get; init; }
+    private IDalamudPluginInterface PluginInterface { get; init; }
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("SkillFinder");
@@ -37,11 +37,11 @@ public sealed class Plugin : IDalamudPlugin
     };
     
     public Plugin(
-        [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-        [RequiredVersion("1.0")] IPluginLog pluginLog,
-        [RequiredVersion("1.0")] IClientState clientState,
-        [RequiredVersion("1.0")] IAddonLifecycle addonLifecycle,
-        [RequiredVersion("1.0")] IGameGui gameGUI
+        IDalamudPluginInterface pluginInterface,
+        IPluginLog pluginLog,
+        IClientState clientState,
+        IAddonLifecycle addonLifecycle,
+        IGameGui gameGUI
             )
     {
         PluginInterface = pluginInterface;
@@ -107,7 +107,7 @@ public sealed class Plugin : IDalamudPlugin
                 {
                     var actionCrossPointer = gameGUI.GetAddonByName(addonName);
                     var actionBar = (AddonActionCross*)actionCrossPointer;
-                    var result = actionBar->ActionBarBase.HandleActionBar(location, action.ActionID);
+                    var result = actionBar->AddonActionBarBase.HandleActionBar(location, action.ActionID);
                     if (result == null)
                     {
                         continue;

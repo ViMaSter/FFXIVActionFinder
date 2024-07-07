@@ -11,13 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\Data\goat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
+    <None Remove="worlds.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="worlds.json" />
+    <PackageReference Update="DalamudPackager" Version="2.1.13" />
   </ItemGroup>
 </Project>
