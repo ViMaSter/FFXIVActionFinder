@@ -4,9 +4,9 @@
   "Punchline": "Where's that button again?!",
   "Description": "Trying to remove duplicate actions from your hotbar?\nRemapping 10 different actions with icons that are all pointy and blue?\n\nHover over actions in the 'Actions & Traits' window to highlight their assigned hotbar slots.",
   "ApplicableVersion": "any",
-  "IconUrl": "https://raw.githubusercontent.com/ViMaSter/ActionFinder/master/images/icon.png",
+  "IconUrl": "https://raw.githubusercontent.com/ViMaSter/FFXIVActionFinder/master/images/icon.png",
   "ImageUrls": [
-    "https://raw.githubusercontent.com/ViMaSter/ActionFinder/master/images/hotbar.png"
+    "https://raw.githubusercontent.com/ViMaSter/FFXIVActionFinder/master/images/hotbar.png"
   ],
   "Tags": [
     "action",
