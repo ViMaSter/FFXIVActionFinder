@@ -1,30 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Interface.Windowing;
-using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using SkillFinder.Extensions;
-using SkillFinder.Windows;
+using ActionFinder.Extensions;
 
-namespace SkillFinder;
+namespace ActionFinder;
 
 #nullable disable
 
 // ReSharper disable once UnusedType.Global - Dalamud plugin entry point
 public sealed class Plugin : IDalamudPlugin
 {
-    private IDalamudPluginInterface PluginInterface { get; init; }
-    public Configuration Configuration { get; init; }
-
-    public readonly WindowSystem WindowSystem = new("SkillFinder");
-    private MainWindow MainWindow { get; init; }
-    
-    private readonly CancellationTokenSource tokenSource = new();
-
     private readonly List<Tuple<int, int>> lastHoveredKeyboardActions = [];
     private readonly List<Tuple<AddonActionCrossExtensions.CrossBars, int>> lastHoveredActionsCross = [];
     private bool showHighlight;
@@ -37,29 +25,10 @@ public sealed class Plugin : IDalamudPlugin
     };
     
     public Plugin(
-        IDalamudPluginInterface pluginInterface,
-        IPluginLog pluginLog,
-        IClientState clientState,
         IAddonLifecycle addonLifecycle,
         IGameGui gameGUI
             )
     {
-        PluginInterface = pluginInterface;
-        PluginLog = pluginLog;
-        ClientState = clientState;
-
-        Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-        Configuration.Initialize(PluginInterface);
-        PluginLog.Info("Restored state: ");
-        
-        MainWindow = new MainWindow();
-
-        WindowSystem.AddWindow(MainWindow);
-
-        PluginInterface.UiBuilder.Draw += DrawUI;
-        PluginInterface.UiBuilder.OpenMainUi += () => MainWindow.Toggle();
-        PluginInterface.UiBuilder.OpenConfigUi += () => {};
-        
         addonLifecycle.RegisterListener(AddonEvent.PreSetup, "ActionMenu", (_, _) =>
         {
             showHighlight = true;
@@ -80,10 +49,9 @@ public sealed class Plugin : IDalamudPlugin
             
             AddonActionCrossExtensions.CleanupHighlights(gameGUI, lastHoveredKeyboardActions, lastHoveredActionsCross);
             
-            // handle keyboard cross bar
-            pluginLog.Warning(action.ActionID.ToString());
             unsafe
             {
+                // handle keyboard cross bar
                 for (var i = 0; i < 10; i++)
                 {
                     var indexString = i == 0 ? "" : i.ToString("D2");
@@ -93,10 +61,6 @@ public sealed class Plugin : IDalamudPlugin
                     if (result == null)
                     {
                         continue;
-                    }
-                    foreach (var (row, column) in result)
-                    {
-                        pluginLog.Warning($"Found action in row {row} column {column}");
                     }
 
                     lastHoveredKeyboardActions.AddRange(result);
@@ -112,10 +76,6 @@ public sealed class Plugin : IDalamudPlugin
                     {
                         continue;
                     }
-                    foreach (var (row, column) in result)
-                    {
-                        pluginLog.Warning($"Found action in row {row} column {column}");
-                    }
 
                     lastHoveredActionsCross.AddRange(result);
                 }
@@ -123,13 +83,8 @@ public sealed class Plugin : IDalamudPlugin
         };
     }
 
-    public IClientState ClientState { get; set; }
-    public IPluginLog PluginLog { get; set; }
-    
     public void Dispose()
     {
-        tokenSource.Cancel();
+        // nothing to dispose
     }
-
-    private void DrawUI() => WindowSystem.Draw();
 }

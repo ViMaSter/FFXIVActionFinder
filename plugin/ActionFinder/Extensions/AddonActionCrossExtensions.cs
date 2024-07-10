@@ -5,7 +5,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
-namespace SkillFinder.Extensions;
+namespace ActionFinder.Extensions;
 
 public static class AddonActionCrossExtensions
 {

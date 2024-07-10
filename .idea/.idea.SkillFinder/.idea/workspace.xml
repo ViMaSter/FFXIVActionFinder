@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d5e4d8d6-bde7-4984-b05c-53fdba37eb0c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/plugin/.idea/.idea.BankStatement/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/.idea/.idea.BankStatement/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/.idea/.idea.BankStatement/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/.idea/.idea.BankStatement/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/.idea/.idea.SkillFinder/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/.idea/.idea.SkillFinder/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder.sln.DotSettings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/Configuration.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/Dalamud.Plugin.Bootstrap.targets" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/Extensions/AddonActionCrossExtensions.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/Plugin.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/SkillFinder.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/SkillFinder.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/Windows/MainWindow.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/SkillFinder/packages.lock.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2084db9501f90d923f873e1975570c83233a7fde8d563261379df27c9ad5c/AtkResNode.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3fdf7eed8581e86bd61ed176c728a19cc8ea25101593a156376effd1a6bcb89/AddonActionCross.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c7142d91c84707326ab6c79849b5c59799dbca2e14b67fff53ae2763c9b2eb/AddonActionBar.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/vimaster/RiderProjects/SkillFinder/SkillFinder/Configuration.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/vimaster/RiderProjects/SkillFinder/SkillFinder/Extensions/AddonActionCrossExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/vimaster/RiderProjects/SkillFinder/SkillFinder/Plugin.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2iDIxpx958Pcrshp4jSjLLQsofz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/Users/vimaster/Library/Application Support/JetBrains/Rider2023.3/resharper-host/DecompilerCache&quot;,
+      &quot;/Users/vimaster/Library/Application Support/JetBrains/Rider2023.3/resharper-host/SourcesCache&quot;,
+      &quot;/Users/vimaster/.local/share/Symbols/src&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CidrLocalAttachDebugger.recentlyUsed">
+      <recent name="com.jetbrains.rider.cpp.debugger.RiderCppLLDBDriverConfiguration" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d5e4d8d6-bde7-4984-b05c-53fdba37eb0c" name="Changes" comment="" />
+      <created>1719018971182</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1719018971182</updated>
+      <workItem from="1719018973760" duration="9543000" />
+      <workItem from="1720205093726" duration="74000" />
+      <workItem from="1720349453976" duration="162000" />
+      <workItem from="1720374877740" duration="665000" />
+      <workItem from="1720643145181" duration="1642000" />
+    </task>
+    <task id="LOCAL-00001" summary="chore: Initial commit">
+      <option name="closed" value="true" />
+      <created>1719022770536</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1719022770536</updated>
+    </task>
+    <task id="LOCAL-00002" summary="chore: Removes code redundancis">
+      <option name="closed" value="true" />
+      <created>1719049178434</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1719049178434</updated>
+    </task>
+    <task id="LOCAL-00003" summary="chore: Updates README.MD">
+      <option name="closed" value="true" />
+      <created>1719049231459</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1719049231459</updated>
+    </task>
+    <task id="LOCAL-00004" summary="chore: Adds support for Dawntrail">
+      <option name="closed" value="true" />
+      <created>1720374935482</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1720374935482</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="chore: Initial commit" />
+    <MESSAGE value="chore: Removes code redundancis" />
+    <MESSAGE value="chore: Updates README.MD" />
+    <MESSAGE value="chore: Adds support for Dawntrail" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Adds support for Dawntrail" />
+  </component>
+</project>
