@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
-
+<Project Sdk="Dalamud.NET.Sdk/12.0.2">
   <PropertyGroup>
     <Version>1.0.0.0</Version>
     <Description>Highlight actions inside bars, when hovered over in the action list.</Description>
     <PackageProjectUrl>https://github.com/ViMaSter/FFXIVActionFinder</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="worlds.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="DalamudPackager" Version="2.1.13" />
   </ItemGroup>
 </Project>
